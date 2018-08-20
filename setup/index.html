@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- info -->
+    <title>Table Editor Setup</title>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <!-- IE fix -->
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="http://metrics.cityoflewisville.com/assets/pmartin_dark.png" />
+    <!-- Vue -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.min.js"></script>
+    <!-- Vuetify -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <!-- custom css -->
+    <link rel="stylesheet" src="style.css">
+    <!-- axios -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+    <!-- IE fix -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://eservices.cityoflewisville.com/COLSecurity/col_security.js"></script>
+    <!-- momentjs -->
+    <!-- <script type="text/javascript" src="./moment/moment.js"></script> -->
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+</head>
+
+<body class="grey lighten-3">
+    <div id="app" v-cloak>
+        <v-app :dark="dark">
+            <v-toolbar dark color="indigo" tabs>
+                <v-btn flat icon @click="dark=!dark">
+                    <v-icon>settings</v-icon>
+                </v-btn>
+                <v-toolbar-title class="white--text">Table Editor Setup</v-toolbar-title>
+                <v-tabs slot="extension" v-model="currentTab" color="indigo">
+                    <v-tabs-slider color="pink"></v-tabs-slider>
+                    <v-tab v-for="tab in tabs" :key="tab.key">
+                        {{ tab.name }}
+                    </v-tab>
+                </v-tabs>
+            </v-toolbar>
+            <v-tabs-items v-model="currentTab">
+                <!-- tab:VIEWS -->
+                <v-tab-item>
+                    <v-container>
+                        <v-layout row>
+                            <v-flex xs12 lg8 offset-lg2>
+                                <v-card v-if="!generated">
+                                    <v-layout px-2>
+                                        <v-card-title primary-title>
+                                            <div>
+                                                <h3 class="headline mb-0">Table Editor Wizard</h3>
+                                            </div>
+                                        </v-card-title>
+                                    </v-layout>
+                                    <v-layout row px-4 wrap>
+                                        <v-flex xs12 sm6>
+                                            <v-select :loading="isLoading.db" :disabled="databases.length==0" :items="databases" label="Database" v-model="selectedDb" outline></v-select>
+                                        </v-flex>
+                                        <v-flex xs12 sm6 v-if="selectedDb!=''">
+                                            <v-select :loading="isLoading.tb" :disabled="selectedDb==''||tables.length==0" :items="tables" label="Table" v-model="selectedTb" outline></v-select>
+                                        </v-flex>
+                                        <v-flex xs12 v-if="selectedDb!=''&&selectedTb!=''">
+                                            Randomize:
+                                            <v-btn icon flat @click="fillPhrase(false, false)">
+                                                <v-icon>autorenew</v-icon>
+                                            </v-btn>
+                                            <v-btn icon flat @click="fillPhrase(true, false)">
+                                                <v-icon>pets</v-icon>
+                                            </v-btn>
+                                            <v-text-field
+                                                v-model="masked"
+                                                label="Your phrase"
+                                                outline>
+                                            </v-text-field>
+                                        </v-flex>
+                                        <v-flex xs12 v-if="!validatePhrase(masked)">
+                                            <v-text-field
+                                                v-model="title"
+                                                label="Table editor title"
+                                                outline
+                                                @keydown.enter="title.length>0 && submitPhrase()">
+                                            </v-text-field>
+                                        </v-flex>
+                                    </v-layout>
+                                    <v-layout px-4 pb-4 row wrap>
+                                        <v-flex xs12 v-if="selectedDb==''">
+                                            <v-alert :value="true" type="info">
+                                                Select a database
+                                            </v-alert>
+                                        </v-flex>
+                                        <v-flex xs12 v-else-if="selectedTb==''">
+                                            <v-alert :value="true" type="info">
+                                                Select a table
+                                            </v-alert>
+                                        </v-flex>
+                                        <v-flex xs12 v-else-if="masked.length==0">
+                                            <v-alert :value="true" type="info">
+                                                Enter a phrase or use the button to generate a random string. This will appear in the URL.
+                                            </v-alert>
+                                        </v-flex>
+                                        <v-flex xs12 v-else-if="validatePhrase(masked)">
+                                            <v-alert :value="true" type="error">
+                                                {{ validatePhrase(masked) }}
+                                            </v-alert>
+                                        </v-flex>
+                                        <v-flex xs12 v-else-if="title.length == 0">
+                                            <v-alert :value="true" type="info">
+                                                Enter a title for the table editor. This will appear in the toolbar at the top of the page.
+                                            </v-alert>
+                                        </v-flex>
+
+                                        <!-- DONE! -->
+                                        <v-flex xs12 v-if="!validatePhrase(masked) && title.length > 0">
+                                            <v-btn @click="submitPhrase">
+                                                submit
+                                            </v-btn>
+                                        </v-flex>
+                                    </v-layout>
+                                </v-card>
+                                <v-flex xs12 v-else>
+                                    <v-alert :value="true" type="success" @click="goToTableEditor(masked)">
+                                        Your editor was set up! Click here to go to table editor now or view them all on the List tab in the toolbar.
+                                    </v-alert>
+                                </v-flex>
+                                <v-btn flat @click="reset">
+                                    start over
+                                </v-btn>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-tab-item>
+                <v-tab-item>
+                    <v-container>
+                        <v-layout row justify-center>
+                            <v-alert :value="true" type="error" v-if="!isLoading.phrases&&phrases.length==0" width="100">
+                                No phrases found
+                            </v-alert>
+                            <v-flex xs12 sm10 lg8 xl6 v-else>
+                                <v-card>
+                                    <v-progress-linear :indeterminate="true" v-if="isLoading.phrases"></v-progress-linear>
+                                    <v-list two-line v-else>
+                                        <template v-for="(item, index) in phrases">
+                                            <v-list-tile :key="item.masked">
+                                                <v-list-tile-content @click="goToTableEditor(item.masked)">
+                                                    <v-flex pa-3>
+                                                        <v-list-tile-title
+                                                            v-html="item.title">
+                                                        </v-list-tile-title>
+                                                        <v-list-tile-sub-title v-html="htmlize(item)"></v-list-tile-title>
+                                                    </v-flex>
+                                                </v-list-tile-content>
+                                                <v-dialog v-model="editing.show" width="500">
+                                                    <v-btn icon ripple @click="edit(item)" slot="activator">
+                                                        <v-icon color="grey">edit</v-icon>
+                                                    </v-btn>
+                                                    <v-card>
+                                                        <v-card-title class="headline grey lighten-2" primary-title>Edit</v-card-title>
+                                                        <v-card-text>
+                                                            Randomize:
+                                                            <v-btn icon flat @click="fillPhrase(false, true)">
+                                                                <v-icon>autorenew</v-icon>
+                                                            </v-btn>
+                                                            <v-btn icon flat @click="fillPhrase(true, true)">
+                                                                <v-icon>pets</v-icon>
+                                                            </v-btn>
+                                                            <v-text-field
+                                                                label="Your phrase"
+                                                                v-model="editing.masked"
+                                                                outline
+                                                                @keydown.enter.prevent="submitPhraseEdit">
+                                                            </v-text-field>
+                                                            <v-text-field
+                                                                label="Title"
+                                                                v-model="editing.title"
+                                                                outline
+                                                                @keydown.enter.prevent="submitPhraseEdit">
+                                                            </v-text-field>
+                                                            <v-btn @click="submitPhraseEdit">submit</v-btn>
+                                                        </v-card-text>
+                                                    </v-card>
+                                                </v-dialog>
+                                                <v-list-tile-action>
+                                                    <v-btn icon ripple @click="deletePhrase(item)">
+                                                        <v-icon color="red lighten-1">delete</v-icon>
+                                                    </v-btn>
+                                                </v-list-tile-action>
+                                            </v-list-tile>
+                                            <v-divider v-if="index!=phrases.length-1"></v-divider>
+                                        </template>
+                                    </v-list>
+                                </v-card>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                </v-tab-item>
+            </v-tab-items>
+        </v-app>
+    </div>
+    <!-- source code -->
+    <script type="text/javascript" src="./libs/gfycat-style-urls/adjectives.js"></script>
+    <script type="text/javascript" src="./libs/gfycat-style-urls/animals.js"></script>
+    <script type="text/javascript" src="./libs/gfycat-style-urls/index.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+</body>

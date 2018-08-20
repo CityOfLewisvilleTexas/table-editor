@@ -1,0 +1,56 @@
+{
+  "_from": "gfycat-style-urls",
+  "_id": "gfycat-style-urls@1.0.3",
+  "_inBundle": false,
+  "_integrity": "sha512-HirQ+dsQWChjnfwZXB07ytzh3eZQFVlOdO2ML1YvpHBOXplumtzGIAejVu91wmj4Cw7t4760M2fKtgI+NAi/2w==",
+  "_location": "/gfycat-style-urls",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "gfycat-style-urls",
+    "name": "gfycat-style-urls",
+    "escapedName": "gfycat-style-urls",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "https://registry.npmjs.org/gfycat-style-urls/-/gfycat-style-urls-1.0.3.tgz",
+  "_shasum": "355c876e0a63754be30f806b401387ce0e6aad65",
+  "_spec": "gfycat-style-urls",
+  "_where": "Z:\\table-editor\\keygen",
+  "author": {
+    "name": "dexo568"
+  },
+  "bugs": {
+    "url": "https://github.com/dexo568/gfycat-style-urls/issues"
+  },
+  "bundleDependencies": false,
+  "deprecated": false,
+  "description": "A package that generates animal-adjective combinations, like those seen in the urls of http://gfycat.com.",
+  "homepage": "https://github.com/dexo568/gfycat-style-urls#readme",
+  "keywords": [
+    "url",
+    "random",
+    "vanity",
+    "generate",
+    "animal",
+    "string",
+    "id"
+  ],
+  "license": "ISC",
+  "main": "index.js",
+  "name": "gfycat-style-urls",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dexo568/gfycat-style-urls.git"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "version": "1.0.3"
+}

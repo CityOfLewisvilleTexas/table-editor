@@ -1,0 +1,37 @@
+[v-cloak] { display: none; }
+* {
+	font-family: "Roboto", "Helvetica Neue", Helvetica, sans-serif;
+}
+
+nav .logo {
+	width: 36px;
+    display: inline-block;
+    height: 34px;
+    vertical-align: middle;
+    background-image: url(./assets/pmartin.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    opacity: 1;
+    margin: 0 16px;
+}
+
+nav .title {
+	font-size: 1.5rem;
+}
+
+.nudgeDown {
+    margin-top: 24px !important
+}
+
+.nudgeUp {
+    margin-top: 0 !important
+}
+
+.hide, .hide * {
+    height: 0 !important;
+    widows: 0 !important;
+    visibility: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}

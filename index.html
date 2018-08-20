@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- info -->
+    <title>Table Editor</title>
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <!-- IE fix -->
+    <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="http://metrics.cityoflewisville.com/assets/pmartin_dark.png" />
+    <!-- Vue -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/babel-polyfill/6.26.0/polyfill.min.js"></script>
+    <!-- Vuetify -->
+    <link href='https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <!-- custom css -->
+    <link rel="stylesheet" src="style.css">
+    <!-- axios -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
+    <!-- IE fix -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.18.0/axios.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="http://eservices.cityoflewisville.com/COLSecurity/col_security.js"></script>
+    <!-- momentjs -->
+    <script type="text/javascript" src="./moment/moment.js"></script>
+    <script src="https://unpkg.com/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.js"></script>
+</head>
+
+<body class="grey lighten-3">
+    <div id="app" v-cloak>
+        <v-app>
+            <v-toolbar dark color="indigo">
+                <!-- <v-toolbar-side-icon></v-toolbar-side-icon> -->
+                <v-toolbar-title class="white--text">{{ title }}</v-toolbar-title>
+                <v-spacer></v-spacer>
+                <v-btn icon @click="fetchDataset">
+                    <v-icon>refresh</v-icon>
+                </v-btn>
+            </v-toolbar>
+            <v-container grid-list-md>
+                <v-layout row wrap>
+                    <v-flex sx12>
+                        <v-alert
+                            :value="isError"
+                            type="error">
+                            {{ errorMessage }}.
+                        </v-alert>
+                    </v-flex>
+                    <v-flex xs12>
+                        <v-card>
+                            <v-card-title>
+                                <!-- Editor -->
+                                <v-dialog v-model="newRowDialog" max-width="700px" scrollable v-if="newRowable">
+                                    <!-- <v-btn slot="activator" color="primary" dark class="mb-2">New Row</v-btn> -->
+                                    <v-btn icon slot="activator">
+                                        <v-icon>add</v-icon>
+                                    </v-btn>
+                                    <v-card>
+                                        <v-card-title>
+                                            <span class="headline">New Row</span>
+                                        </v-card-title>
+                                        <v-card-text>
+                                            <v-container grid-list-md>
+                                                <v-layout wrap>
+                                                    <v-flex xs12 v-for="header in headers" :key="header.value">
+                                                        <v-text-field :label="header.text" v-if="isEditable(header.text)"></v-text-field>
+                                                    </v-flex>
+                                                </v-layout>
+                                            </v-container>
+                                        </v-card-text>
+                                        <v-card-actions>
+                                            <v-spacer></v-spacer>
+                                            <v-btn flat @click.native="newRowDialog=false">Cancel</v-btn>
+                                            <v-btn color="green darken-1" dark @click.native="save">Save</v-btn>
+                                        </v-card-actions>
+                                    </v-card>
+                                </v-dialog>
+                                <v-spacer></v-spacer>
+                                <v-text-field v-model="search" append-icon="search" label="Search" single-line hide-details></v-text-field>
+                            </v-card-title>
+                            <v-data-table
+                                :headers="headers"
+                                :items="rows"
+                                :search="search"
+                                :rows-per-page-items="pagination"
+                                :loading="isLoading.data">
+                                <v-progress-linear slot="progress" color="blue" indeterminate></v-progress-linear>
+                                <template slot="items" slot-scope="props">
+                                    <td v-for="(prop, i) in props.item">
+                                        <span v-if="!isEditable(i)">{{ prop }}</span>
+                                        <v-edit-dialog v-else
+                                            :return-value.sync="prop"
+                                            @open="openEditDialog"
+                                            @close="cancelEditDialog(props.item, i)"
+                                            @cancel="cancelEditDialog(props.item, i)"
+                                            @save="saveEditDialog(props.item, i)"
+                                            large
+                                            lazy>
+                                                {{ prop }}
+                                                <!-- boolean -->
+                                                <v-flex v-if="isDataType(i, 'BIT')" slot="input">
+                                                    <v-checkbox
+                                                        v-model="props.item[i]"
+                                                        :label="JSON.stringify(props.item[i])"
+                                                        :disabled="nullified">
+                                                    </v-checkbox>
+                                                </v-flex>
+                                                <!-- date -->
+                                                <v-flex v-else-if="isDataType(i, 'date')" slot="input">
+                                                    <v-btn flat icon @click="setDate(props.item,i)"><v-icon>calendar_today</v-icon></v-btn>
+                                                    <v-textarea
+                                                    width="500"
+                                                        outline
+                                                        :label="i"
+                                                        :disabled="nullified"
+                                                        v-model="props.item[i]"
+                                                        @keydown.enter.prevent>
+                                                    </v-textarea>
+                                                </v-flex>
+                                                <!-- datetime -->
+                                                <v-flex v-else-if="isDataType(i, 'datetime')" slot="input">
+                                                    <v-btn flat icon @click="setDateTime(props.item,i)"><v-icon>calendar_today</v-icon></v-btn>
+                                                    <v-textarea
+                                                        outline
+                                                        :label="i"
+                                                        :disabled="nullified"
+                                                        v-model="props.item[i]"
+                                                        @keydown.enter.prevent>
+                                                    </v-textarea>
+                                                </v-flex>
+                                                <v-flex v-else slot="input">
+                                                    <v-textarea
+                                                        class="nudgeDown"
+                                                        outline
+                                                        :label="i"
+                                                        :disabled="nullified"
+                                                        v-model="props.item[i]"
+                                                        @keydown.enter.prevent>
+                                                    </v-textarea>
+                                                </v-flex>
+                                                <v-checkbox slot="input" class="hide"></v-checkbox>
+                                                <v-checkbox
+                                                    v-if="isNullable(i)"
+                                                    v-model="nullified"
+                                                    label="Null?"
+                                                    slot="input"
+                                                    :class="{ nudgeUp : isNullable(i) }">
+                                                </v-checkbox>
+                                        </v-edit-dialog>
+                                    </td>
+                                </template>
+                                <v-flex ma-3 slot="no-results">
+                                    <v-alert :value="true" color="error" icon="warning">
+                                        Your search for "{{ search }}" found no results.
+                                    </v-alert>
+                                </v-flex>
+                            </v-data-table>
+                        </v-card>
+                    </v-flex>
+                </v-layout>
+            </v-container>
+            <v-snackbar
+                v-model="snackbar.show"
+                :color="snackbar.color"
+                :timeout="snackbar.timeout">
+                {{ snackbar.text }}
+                <v-btn dark flat @click="snackbar.show = false">
+                    Close
+                </v-btn>
+            </v-snackbar>
+        </v-app>
+    </div>
+    <!-- source code -->
+    <script type="text/javascript" src="app.js"></script>
+</body>

@@ -1,0 +1,37 @@
+[v-cloak] { display: none; }
+* {
+	font-family: "Roboto", "Helvetica Neue", Helvetica, sans-serif;
+}
+
+nav .logo {
+	width: 36px;
+    display: inline-block;
+    height: 34px;
+    vertical-align: middle;
+    background-image: url(./assets/pmartin.svg);
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+    opacity: 1;
+    margin: 0 16px;
+}
+
+nav .title {
+	font-size: 1.5rem;
+}
+
+.v-alert.success {
+    cursor: pointer
+}
+
+.v-alert.success code {
+    word-break: break-all;
+    padding: 4px !important;
+}
+.v-alert.success code:before, .v-alert.success code:after {
+    content: '' !important;
+}
+
+.v-list__tile {
+    cursor: pointer !important
+}
