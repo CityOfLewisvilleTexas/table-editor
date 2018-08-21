@@ -122,7 +122,7 @@ var app = new Vue({
         },
 
         goToTableEditor: function(end) {
-            window.open('http://apps.cityoflewisville.com/beta/table-editor?mask=' + end.replace(/ /g, '_'))
+            window.open('../?mask=' + end.replace(/ /g, '_'))
         },
 
         validatePhrase: function(phrase) {
