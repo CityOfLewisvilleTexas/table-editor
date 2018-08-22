@@ -65,8 +65,29 @@
                                         <v-card-text>
                                             <v-container grid-list-md>
                                                 <v-layout wrap>
-                                                    <v-flex xs12 v-for="header in headers" :key="header.value">
-                                                        <v-text-field :label="header.text" v-if="isEditable(header.text)"></v-text-field>
+                                                    <v-flex xs12 v-for="header in headersBak" :key="header.value" v-if="isEditable(header.text, true)">
+                                                        <!-- datetime -->
+                                                        <v-text-field
+                                                            v-if="isDataType(header.text, 'datetime', true)"
+                                                            :label="header.text"
+                                                            v-model="newRow[header.text]"
+                                                            prepend-icon="calendar_today"
+                                                            @click:prepend="setDateTime(newRow,header.text)">
+                                                        </v-text-field>
+                                                        <!-- date -->
+                                                        <v-text-field
+                                                            v-else-if="isDataType(header.text, 'date', true)"
+                                                            :label="header.text"
+                                                            v-model="newRow[header.text]"
+                                                            prepend-icon="calendar_today"
+                                                            @click:prepend="setDate(newRow,header.text)">
+                                                        </v-text-field>
+                                                        <!-- else -->
+                                                        <v-text-field
+                                                            v-else
+                                                            :label="header.text"
+                                                            v-model="newRow[header.text]">
+                                                        </v-text-field>
                                                     </v-flex>
                                                 </v-layout>
                                             </v-container>
@@ -74,7 +95,7 @@
                                         <v-card-actions>
                                             <v-spacer></v-spacer>
                                             <v-btn flat @click.native="newRowDialog=false">Cancel</v-btn>
-                                            <v-btn color="green darken-1" dark @click.native="save">Save</v-btn>
+                                            <v-btn color="green darken-1" dark @click.native="insertNewRow">Save</v-btn>
                                         </v-card-actions>
                                     </v-card>
                                 </v-dialog>
@@ -109,7 +130,7 @@
                                                     </v-checkbox>
                                                 </v-flex>
                                                 <!-- date -->
-                                                <v-flex v-else-if="isDataType(i, 'date')" slot="input">
+                                                <v-flex v-else-if="isDataType(i, 'date', false)" slot="input">
                                                     <v-btn flat icon @click="setDate(props.item,i)"><v-icon>calendar_today</v-icon></v-btn>
                                                     <v-textarea
                                                     width="500"
@@ -121,7 +142,7 @@
                                                     </v-textarea>
                                                 </v-flex>
                                                 <!-- datetime -->
-                                                <v-flex v-else-if="isDataType(i, 'datetime')" slot="input">
+                                                <v-flex v-else-if="isDataType(i, 'datetime', false)" slot="input">
                                                     <v-btn flat icon @click="setDateTime(props.item,i)"><v-icon>calendar_today</v-icon></v-btn>
                                                     <v-textarea
                                                         outline

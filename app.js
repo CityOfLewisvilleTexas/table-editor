@@ -9,6 +9,7 @@ var app = new Vue({
         nullified: false,
         title: '',
         newRowDialog: false,
+        headersBak: [],
         headers: [],
         rows: [],
         rowsBackup: [],
@@ -34,6 +35,7 @@ var app = new Vue({
         newRowable: true,
         excludedHeaders: [],
         noEditHeaders: [],
+        newRow: {}
     },
 
     // start here
@@ -44,13 +46,17 @@ var app = new Vue({
     // functions
     methods: {
 
-        isDataType: function(col, type) {
-            for (var i in this.headers) if (this.headers[i].text==col) return this.headers[i].dataType == type
+        isDataType: function(col, type, isBak) {
+            if (isBak) { for (var i in this.headersBak) if (this.headersBak[i].text==col) return this.headersBak[i].dataType == type }
+            else { for (var i in this.headers) if (this.headers[i].text==col) return this.headers[i].dataType == type }
             return false
         },
 
-        isEditable: function(col) {
-            for (var i in this.headers) if (this.headers[i].text==col) return !this.headers[i].isPrimaryKey
+        isEditable: function(col, isBak) {
+            if (isBak) {
+                for (var i in this.headersBak) if (this.headersBak[i].text==col) return !this.headersBak[i].isPrimaryKey
+            }
+            else for (var i in this.headers) if (this.headers[i].text==col) return !this.headers[i].isPrimaryKey
             return false
         },
 
@@ -75,6 +81,20 @@ var app = new Vue({
 
         // save dataset
         handleDataset: function(results) {
+            this.newRowDialog = false
+            this.excludedHeaders = results.data.tableinfo[0].excludedheaders.split('|||')
+            this.headersBak = results.data.columns.map(function(col) {
+                return {
+                        text: col.NAME,
+                        value: col.NAME,
+                        isNullable: col.IS_NULLABLE == 'YES',
+                        isPrimaryKey: col.IS_PK == true,
+                        dataType: col.DATA_TYPE
+                    }
+            })
+            this.headersBak.forEach(function(header) {
+                if (!header.isPrimaryKey) Vue.set(this.newRow, header.text, '')
+            }.bind(this))
             this.headers = results.data.columns
                 .map(function(col) {
                     return {
@@ -108,6 +128,7 @@ var app = new Vue({
         },
 
         setDateTime: function(row, col) {
+            console.log('hi')
             row[col] = moment().format('YYYY-MM-DDThh:mm:ss')+'Z'
         },
 
@@ -195,8 +216,24 @@ var app = new Vue({
                     }
                 }.bind(this))
             }
+        },
 
+        insertNewRow: function() {
+            var values = []
+            this.headersBak
+                .filter(function(h) { return !h.isPrimaryKey })
+                .map(function(h) { return h.text })
+                .forEach(function(h) {
+                    values.push('\'' + this.newRow[h].replace(/'/g, '\'\'' ) + '\'')
+                }.bind(this))
 
+            axios.post('http://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Insert Table Row', {
+                masked: getUrlParameter('mask'),
+                columns: this.headersBak.filter(function(h) { return !h.isPrimaryKey }).map(function(h) { return '[' + h.text + ']' }).join(', '),
+                values: values.join(', '),
+                auth_token: localStorage.colAuthToken
+            })
+            .then(function(res) { this.fetchDataset() }.bind(this))
         }
     }
 })
@@ -209,4 +246,5 @@ function getUrlParameter(sParam) {
         sParameterName = sURLVariables[i].split('=');
         if (sParameterName[0] === sParam) return sParameterName[1] === undefined ? true : sParameterName[1];
     }
+
 };
