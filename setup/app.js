@@ -18,6 +18,7 @@ var app = new Vue({
             selectedTb: null,
             masked: null,
             title: null,
+            excludedHeaders: null,
             id: null
         },
         masked: '',
@@ -27,6 +28,7 @@ var app = new Vue({
         phrases: [],
         databases: [],
         tables: [],
+        excludedHeaders: [],
         isLoading: {
             phrases: false,
             db: false,
@@ -141,6 +143,7 @@ var app = new Vue({
                 tablename: this.fullTableName,
                 masked: this.masked.replace(/ /g, '_'),
                 title: this.title,
+                excludedheaders: this.excludedHeaders.join('|||'),
                 auth_token: localStorage.colAuthToken
             }).then(this.handlePhraseSubmit)
         },
@@ -158,6 +161,7 @@ var app = new Vue({
                 id: this.editing.id,
                 masked: this.editing.masked.replace(/ /g, '_'),
                 title: this.editing.title,
+                excludedheaders: this.editing.excludedHeaders.join('|||'),
                 auth_token: localStorage.colAuthToken
             }).then(this.handlePhraseEditSubmit)
         },
@@ -235,6 +239,13 @@ var app = new Vue({
             this.editing.masked = item.masked
             this.editing.title = item.title
             this.editing.id = item.id
+            this.editing.excludedHeaders = item.excludedheaders.length == 0 ? [] : item.excludedheaders.split('|||')
+        },
+
+        removeExcludedHeader: function(item, editing) {
+            if (!editing) this.excludedHeaders.splice(this.excludedHeaders.indexOf(item), 1)
+            else this.editing.excludedHeaders.splice(this.editing.excludedHeaders.indexOf(item), 1)
+            // this.excludedHeaders = [...this.excludedHeaders]
         }
     }
 })

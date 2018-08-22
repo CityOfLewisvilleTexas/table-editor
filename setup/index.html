@@ -114,6 +114,27 @@
                                                 Enter a title for the table editor. This will appear in the toolbar at the top of the page.
                                             </v-alert>
                                         </v-flex>
+                                        <v-flex xs12 v-else-if="title.length != 0">
+                                            <v-combobox
+                                                v-model="excludedHeaders"
+                                                label="Columns to exclude"
+                                                chips
+                                                clearable
+                                                solo
+                                                :append-icon="null"
+                                                multiple
+                                                hint="Press enter or tab after each column"
+                                                persistent-hint>
+                                                <template slot="selection" slot-scope="data">
+                                                    <v-chip
+                                                        :selected="data.selected"
+                                                        close
+                                                        @input="removeExcludedHeader(data.item, false)">
+                                                        <strong>{{ data.item }}</strong>&nbsp;
+                                                    </v-chip>
+                                                </template>
+                                            </v-combobox>
+                                        </v-flex>
 
                                         <!-- DONE! -->
                                         <v-flex xs12 v-if="!validatePhrase(masked) && title.length > 0">
@@ -181,6 +202,25 @@
                                                                 outline
                                                                 @keydown.enter.prevent="submitPhraseEdit">
                                                             </v-text-field>
+                                                            <v-combobox
+                                                                v-model="editing.excludedHeaders"
+                                                                label="Columns to exclude"
+                                                                chips
+                                                                clearable
+                                                                solo
+                                                                :append-icon="null"
+                                                                multiple
+                                                                hint="Press enter or tab after each column"
+                                                                persistent-hint>
+                                                                <template slot="selection" slot-scope="data">
+                                                                    <v-chip
+                                                                        :selected="data.selected"
+                                                                        close
+                                                                        @input="removeExcludedHeader(data.item, true)">
+                                                                        <strong>{{ data.item }}</strong>&nbsp;
+                                                                    </v-chip>
+                                                                </template>
+                                                            </v-combobox>
                                                             <v-btn @click="submitPhraseEdit">submit</v-btn>
                                                         </v-card-text>
                                                     </v-card>
