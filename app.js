@@ -38,6 +38,17 @@ var app = new Vue({
         newRow: {}
     },
 
+    watch: {
+        // clears out the new row dialog when closed or canceled
+        newRowDialog: function() {
+            for (var prop in this.newRow) {
+                if (this.newRow.hasOwnProperty(prop)) {
+                    this.newRow[prop] = null
+                }
+            }
+        }
+    },
+
     // start here
     mounted: function() {
         this.fetchDataset()
