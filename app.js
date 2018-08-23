@@ -179,6 +179,9 @@ var app = new Vue({
                 if (this.rowsBackup[i].ID == row.ID) audit.oldValue = val==null||val==undefined ? null : this.rowsBackup[i][column].toString()
             }
 
+            // nullify empty strings if necessary
+            if (this.isNullable(column) && audit.newValue == '' || audit.newValue == null) audit.newValue = null
+
             // check if changes were actually made
             if (audit.newValue == audit.oldValue) {
                 this.snackbar.color = 'info'
