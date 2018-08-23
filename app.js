@@ -251,7 +251,15 @@ var app = new Vue({
                 values: values.join(', '),
                 auth_token: localStorage.colAuthToken
             })
-            .then(function(res) { this.fetchDataset() }.bind(this))
+            .then(function(res) {
+                if (res.data[0][0].hasOwnProperty('ErrorCode')) {
+                    console.log('>> error: ', res.data[0][0])
+                    this.snackbar.color = 'error'
+                    this.snackbar.text = 'Error: ' + res.data[0][0].ErrorCode + '. Check console.'
+                    this.snackbar.timeout = 10000
+                    this.snackbar.show = true
+                } else { this.fetchDataset() }
+            }.bind(this))
         }
     }
 })
