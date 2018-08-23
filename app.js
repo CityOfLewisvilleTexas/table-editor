@@ -93,7 +93,7 @@ var app = new Vue({
                     }
             })
             this.headersBak.forEach(function(header) {
-                if (!header.isPrimaryKey) Vue.set(this.newRow, header.text, '')
+                if (!header.isPrimaryKey) Vue.set(this.newRow, header.text, null)
             }.bind(this))
             this.headers = results.data.columns
                 .map(function(col) {
@@ -227,8 +227,12 @@ var app = new Vue({
                 .filter(function(h) { return !h.isPrimaryKey })
                 .map(function(h) { return h.text })
                 .forEach(function(h) {
-                    values.push('\'' + this.newRow[h].replace(/'/g, '\'\'' ) + '\'')
+                    // nullify empty strings if necessary
+                    if (this.isNullable(h.text) && this.newRow[h] == '' || this.newRow[h] == null) values.push('null')
+                    else values.push('\'' + this.newRow[h].replace(/'/g, '\'\'' ) + '\'')
                 }.bind(this))
+
+            console.log(values)
 
             axios.post('http://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Insert Table Row', {
                 masked: getUrlParameter('mask'),
