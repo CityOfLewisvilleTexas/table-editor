@@ -134,6 +134,25 @@
                                                     </v-chip>
                                                 </template>
                                             </v-combobox>
+                                            <v-combobox
+                                                v-model="allowedUsers"
+                                                label="Users to allow (email)"
+                                                chips
+                                                clearable
+                                                solo
+                                                :append-icon="null"
+                                                multiple
+                                                hint="Press enter or tab after each user"
+                                                persistent-hint>
+                                                <template slot="selection" slot-scope="data">
+                                                    <v-chip
+                                                        :selected="data.selected"
+                                                        close
+                                                        @input="removeAllowedUser(data.item, false)">
+                                                        <strong>{{ data.item }}</strong>&nbsp;
+                                                    </v-chip>
+                                                </template>
+                                            </v-combobox>
                                         </v-flex>
 
                                         <!-- DONE! -->
@@ -217,6 +236,25 @@
                                                                         :selected="data.selected"
                                                                         close
                                                                         @input="removeExcludedHeader(data.item, true)">
+                                                                        <strong>{{ data.item }}</strong>&nbsp;
+                                                                    </v-chip>
+                                                                </template>
+                                                            </v-combobox>
+                                                            <v-combobox
+                                                                v-model="editing.allowedUsers"
+                                                                label="Users to allow (email)"
+                                                                chips
+                                                                clearable
+                                                                solo
+                                                                :append-icon="null"
+                                                                multiple
+                                                                hint="Press enter or tab after each user"
+                                                                persistent-hint>
+                                                                <template slot="selection" slot-scope="data">
+                                                                    <v-chip
+                                                                        :selected="data.selected"
+                                                                        close
+                                                                        @input="removeAllowedUser(data.item, true)">
                                                                         <strong>{{ data.item }}</strong>&nbsp;
                                                                     </v-chip>
                                                                 </template>

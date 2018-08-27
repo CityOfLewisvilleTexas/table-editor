@@ -29,6 +29,7 @@ var app = new Vue({
         databases: [],
         tables: [],
         excludedHeaders: [],
+        allowedUsers: [],
         isLoading: {
             phrases: false,
             db: false,
@@ -144,6 +145,7 @@ var app = new Vue({
                 masked: this.masked.replace(/ /g, '_'),
                 title: this.title,
                 excludedheaders: this.excludedHeaders.join('|||'),
+                allowedusers: this.allowedUsers.join('|||'),
                 auth_token: localStorage.colAuthToken
             }).then(this.handlePhraseSubmit)
         },
@@ -162,6 +164,7 @@ var app = new Vue({
                 masked: this.editing.masked.replace(/ /g, '_'),
                 title: this.editing.title,
                 excludedheaders: this.editing.excludedHeaders.join('|||'),
+                allowedusers: this.editing.allowedUsers.join('|||'),
                 auth_token: localStorage.colAuthToken
             }).then(this.handlePhraseEditSubmit)
         },
@@ -240,12 +243,17 @@ var app = new Vue({
             this.editing.title = item.title
             this.editing.id = item.id
             this.editing.excludedHeaders = item.excludedheaders.length == 0 ? [] : item.excludedheaders.split('|||')
+            this.editing.allowedUsers = item.allowedusers.length == 0 ? [] : item.allowedusers.split('|||')
         },
 
         removeExcludedHeader: function(item, editing) {
             if (!editing) this.excludedHeaders.splice(this.excludedHeaders.indexOf(item), 1)
             else this.editing.excludedHeaders.splice(this.editing.excludedHeaders.indexOf(item), 1)
-            // this.excludedHeaders = [...this.excludedHeaders]
+        },
+
+        removeAllowedUser: function(item, editing) {
+            if (!editing) this.allowedUsers.splice(this.allowedUsers.indexOf(item), 1)
+            else this.editing.allowedUsers.splice(this.editing.allowedUsers.indexOf(item), 1)
         }
     }
 })

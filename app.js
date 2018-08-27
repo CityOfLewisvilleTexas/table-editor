@@ -84,7 +84,9 @@ var app = new Vue({
             this.isLoading.data = true
             axios.post('https://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Get Table Data', {
                 phrase: mask,
-                auth_token: localStorage.colAuthToken
+                auth_token: localStorage.colAuthToken,
+                user: localStorage.colEmail,
+                authtoken: localStorage.colAuthToken
             })
             .then(this.handleDataset)
             .catch(this.networkError)
@@ -175,7 +177,8 @@ var app = new Vue({
                 newValue: this.nullified ? null : row[column],
                 columnName: column,
                 user: localStorage.colEmail,
-                auth_token: localStorage.colAuthToken
+                auth_token: localStorage.colAuthToken,
+                authtoken: localStorage.colAuthToken
             }
 
             // get primary key
