@@ -82,7 +82,7 @@ var app = new Vue({
             var mask = getUrlParameter('mask')
             if (mask==null || mask==undefined) return
             this.isLoading.data = true
-            axios.post('http://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Get Table Data', {
+            axios.post('https://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Get Table Data', {
                 phrase: mask,
                 auth_token: localStorage.colAuthToken
             })
@@ -205,7 +205,7 @@ var app = new Vue({
             else {
                 console.log('>> payload: ', audit)
                 // submit changes
-                axios.post('http://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Update Table Row', audit).
+                axios.post('https://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Update Table Row', audit).
                 then(function(res) {
 
                     if (res.data[0][0].hasOwnProperty('ErrorCode')) {
@@ -245,7 +245,7 @@ var app = new Vue({
 
             console.log(values)
 
-            axios.post('http://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Insert Table Row', {
+            axios.post('https://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Insert Table Row', {
                 masked: getUrlParameter('mask'),
                 columns: this.headersBak.filter(function(h) { return !h.isPrimaryKey }).map(function(h) { return '[' + h.text + ']' }).join(', '),
                 values: values.join(', '),
