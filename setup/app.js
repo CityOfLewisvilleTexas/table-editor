@@ -192,6 +192,8 @@ var app = new Vue({
             this.isLoading.db = false,
             this.isLoading.tb = false
             this.generated = false
+            this.excludedHeaders = []
+            this.allowedUsers = []
             this.fetchPhrases()
             this.fetchDatabases()
         },

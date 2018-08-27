@@ -60,10 +60,10 @@
                                     </v-layout>
                                     <v-layout row px-4 wrap>
                                         <v-flex xs12 sm6>
-                                            <v-select auto :loading="isLoading.db" :disabled="databases.length==0" :items="databases" label="Database" v-model="selectedDb" outline></v-select>
+                                            <v-select :loading="isLoading.db" :disabled="databases.length==0" :items="databases" label="Database" v-model="selectedDb" outline></v-select>
                                         </v-flex>
                                         <v-flex xs12 sm6 v-if="selectedDb!=''">
-                                            <v-select auto :loading="isLoading.tb" :disabled="selectedDb==''||tables.length==0" :items="tables" label="Table" v-model="selectedTb" outline></v-select>
+                                            <v-select :loading="isLoading.tb" :disabled="selectedDb==''||tables.length==0" :items="tables" label="Table" v-model="selectedTb" outline></v-select>
                                         </v-flex>
                                         <v-flex xs12 v-if="selectedDb!=''&&selectedTb!=''">
                                             Randomize:
