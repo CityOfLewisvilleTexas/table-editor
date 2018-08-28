@@ -30,6 +30,7 @@ var app = new Vue({
         tables: [],
         excludedHeaders: [],
         allowedUsers: [],
+        lockedHeaders: [],
         isLoading: {
             phrases: false,
             db: false,
@@ -150,6 +151,7 @@ var app = new Vue({
                 masked: this.masked.replace(/ /g, '_'),
                 title: this.title,
                 excludedheaders: this.excludedHeaders.join('|||'),
+                lockedheaders: this.lockedHeaders.join('|||'),
                 allowedusers: this.allowedUsers.join('|||'),
                 auth_token: localStorage.colAuthToken
             }).then(this.handlePhraseSubmit)
@@ -169,6 +171,7 @@ var app = new Vue({
                 masked: this.editing.masked.replace(/ /g, '_'),
                 title: this.editing.title,
                 excludedheaders: this.editing.excludedHeaders.join('|||'),
+                lockedheaders: this.editing.lockedHeaders.join('|||'),
                 allowedusers: this.editing.allowedUsers.join('|||'),
                 auth_token: localStorage.colAuthToken
             }).then(this.handlePhraseEditSubmit)
@@ -193,6 +196,7 @@ var app = new Vue({
             this.isLoading.tb = false
             this.generated = false
             this.excludedHeaders = []
+            this.lockedHeaders = []
             this.allowedUsers = []
             this.fetchPhrases()
             this.fetchDatabases()
@@ -250,6 +254,7 @@ var app = new Vue({
             this.editing.title = item.title
             this.editing.id = item.id
             this.editing.excludedHeaders = item.excludedheaders.length == 0 ? [] : item.excludedheaders.split('|||')
+            this.editing.lockedHeaders = item.lockedheaders.length == 0 ? [] : item.lockedheaders.split('|||')
             this.editing.allowedUsers = item.allowedusers.length == 0 ? [] : item.allowedusers.split('|||')
         },
 
@@ -261,6 +266,11 @@ var app = new Vue({
         removeAllowedUser: function(item, editing) {
             if (!editing) this.allowedUsers.splice(this.allowedUsers.indexOf(item), 1)
             else this.editing.allowedUsers.splice(this.editing.allowedUsers.indexOf(item), 1)
+        },
+
+        removeLockedHeader: function(item, editing) {
+            if (!editing) this.lockedHeaders.splice(this.lockedHeaders.indexOf(item), 1)
+            else this.editing.lockedHeaders.splice(this.editing.lockedHeaders.indexOf(item), 1)
         }
     }
 })

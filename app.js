@@ -33,6 +33,7 @@ var app = new Vue({
             { text: '50', value: 50 }
         ],
         newRowable: true,
+        lockedHeaders: [],
         excludedHeaders: [],
         noEditHeaders: [],
         newRow: {}
@@ -67,7 +68,21 @@ var app = new Vue({
             if (isBak) {
                 for (var i in this.headersBak) if (this.headersBak[i].text==col) return !this.headersBak[i].isPrimaryKey
             }
-            else for (var i in this.headers) if (this.headers[i].text==col) return !this.headers[i].isPrimaryKey
+            else {
+                var isPk = false
+                var isLocked = false
+                for (var i in this.headers) {
+                    if (this.headers[i].text==col) {
+                        isPk = this.headers[i].isPrimaryKey
+                    }
+                }
+                for (var i in this.lockedHeaders) {
+                    if (this.lockedHeaders[i]==col) {
+                        isLocked = true
+                    }
+                }
+                return !isPk && !isLocked
+            }
             return false
         },
 
@@ -95,6 +110,7 @@ var app = new Vue({
         // save dataset
         handleDataset: function(results) {
             this.newRowDialog = false
+            this.lockedHeaders = results.data.tableinfo[0].lockedheaders.split('|||')
             this.excludedHeaders = results.data.tableinfo[0].excludedheaders.split('|||')
             this.headersBak = results.data.columns.map(function(col) {
                 return {

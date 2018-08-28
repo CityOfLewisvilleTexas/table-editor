@@ -116,11 +116,30 @@
                                         </v-flex>
                                         <v-flex xs12 v-else-if="title.length != 0">
                                             <v-combobox
+                                                v-model="lockedHeaders"
+                                                label="Columns to lock (non-editable)"
+                                                chips
+                                                clearable
+                                                outline
+                                                :append-icon="null"
+                                                multiple
+                                                hint="Press enter or tab after each column"
+                                                persistent-hint>
+                                                <template slot="selection" slot-scope="data">
+                                                    <v-chip
+                                                        :selected="data.selected"
+                                                        close
+                                                        @input="removeLockedHeader(data.item, false)">
+                                                        <strong>{{ data.item }}</strong>&nbsp;
+                                                    </v-chip>
+                                                </template>
+                                            </v-combobox>
+                                            <v-combobox
                                                 v-model="excludedHeaders"
                                                 label="Columns to exclude"
                                                 chips
                                                 clearable
-                                                solo
+                                                outline
                                                 :append-icon="null"
                                                 multiple
                                                 hint="Press enter or tab after each column"
@@ -139,7 +158,7 @@
                                                 label="Users to allow (email)"
                                                 chips
                                                 clearable
-                                                solo
+                                                outline
                                                 :append-icon="null"
                                                 multiple
                                                 hint="Press enter or tab after each user"
@@ -222,11 +241,30 @@
                                                                 @keydown.enter.prevent="submitPhraseEdit">
                                                             </v-text-field>
                                                             <v-combobox
+                                                                v-model="editing.lockedHeaders"
+                                                                label="Columns to lock (non-editable)"
+                                                                chips
+                                                                clearable
+                                                                outline
+                                                                :append-icon="null"
+                                                                multiple
+                                                                hint="Press enter or tab after each column"
+                                                                persistent-hint>
+                                                                <template slot="selection" slot-scope="data">
+                                                                    <v-chip
+                                                                        :selected="data.selected"
+                                                                        close
+                                                                        @input="removeLockedHeader(data.item, true)">
+                                                                        <strong>{{ data.item }}</strong>&nbsp;
+                                                                    </v-chip>
+                                                                </template>
+                                                            </v-combobox>
+                                                            <v-combobox
                                                                 v-model="editing.excludedHeaders"
                                                                 label="Columns to exclude"
                                                                 chips
                                                                 clearable
-                                                                solo
+                                                                outline
                                                                 :append-icon="null"
                                                                 multiple
                                                                 hint="Press enter or tab after each column"
@@ -245,7 +283,7 @@
                                                                 label="Users to allow (email)"
                                                                 chips
                                                                 clearable
-                                                                solo
+                                                                outline
                                                                 :append-icon="null"
                                                                 multiple
                                                                 hint="Press enter or tab after each user"
