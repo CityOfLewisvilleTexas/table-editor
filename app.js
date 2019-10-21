@@ -3,7 +3,7 @@
 // Vue!
 var app = new Vue({
     el: "#app",
-
+    // vuetify: new Vuetify(),
     // vars
     data: {
         nullified: false,
@@ -179,7 +179,6 @@ var app = new Vue({
             }
         },
         saveEditDialog: function(row, column) {
-
             // reset error message just in case
             this.isError = false
             this.errorMessage = 'You should not see this!'
@@ -187,7 +186,7 @@ var app = new Vue({
             // set up object to pass to SP
             var audit = {
                 masked: getUrlParameter('mask'),
-                pkColumn: '',
+                pkColumn: '', 
                 pkValue: row,
                 oldValue: '',
                 newValue: this.nullified ? null : row[column],
@@ -198,9 +197,14 @@ var app = new Vue({
             }
 
             // get primary key
-            for (var i in this.headers) if (this.headers[i].isPrimaryKey == true) audit.pkColumn = this.headers[i].text
+            // loop over all items in headers object using [i] as index, check if the primaryKey 
+            // exists for each header. If is primary key, audit.pkColumn takes no text prop of headers[i]
+            for (var i in this.headers) if (this.headers[i].isPrimaryKey == true) audit.pkColumn = this.headers[i].text 
+         
 
             // get primary key value
+            // get index of selected row based on the row that was clicked, and reference the value
+            // by determining the primary key column 
             audit.pkValue = row[audit.pkColumn]
 
             // find old value
@@ -226,11 +230,11 @@ var app = new Vue({
                 // submit changes
                 axios.post('https://ax1vnode1.cityoflewisville.com/v2/?webservice=ITS/Table Editor/Update Table Row', audit).
                 then(function(res) {
-
-                    if (res.data[0][0].hasOwnProperty('ErrorCode')) {
+                    if (res.data[0][0].hasOwnProperty('ErrorCode')) { //@TODO: Looks like it is erroring out due to a permissions issue with UPDATE statement 
                         console.log('>> error: ', res.data[0][0])
                         this.snackbar.color = 'error'
-                        this.snackbar.text = 'Error: ' + res.data[0][0].ErrorCode + '. Check console.'
+                        this.snackbar.text = 'Error: ' + res.data[0][0].ErrorCode + 
+                        '. Looks like the Error Was: ' + res.data[0][0]['Error']
                         this.snackbar.timeout = 10000
                         this.snackbar.show = true
                     } else {
@@ -271,13 +275,17 @@ var app = new Vue({
                 auth_token: localStorage.colAuthToken
             })
             .then(function(res) {
+                debugger
+                    console.log('data:', res)
+                if(res.data[0] != undefined) {
                 if (res.data[0][0].hasOwnProperty('ErrorCode')) {
                     console.log('>> error: ', res.data[0][0])
                     this.snackbar.color = 'error'
                     this.snackbar.text = 'Error: ' + res.data[0][0].ErrorCode + '. Check console.'
                     this.snackbar.timeout = 10000
                     this.snackbar.show = true
-                } else { this.fetchDataset() }
+                } 
+            } else { this.fetchDataset() }
             }.bind(this))
         }
     }

@@ -3,7 +3,7 @@
 // Vue!
 var app = new Vue({
     el: "#app",
-
+    // vuetify: new Vuetify(),
     // vars
     data: {
         dark: false,
@@ -235,6 +235,7 @@ var app = new Vue({
         },
 
         handlePhraseDelete: function(res) {
+            console.log(res)
             this.phrases = res.data[0]
             this.isLoading.phrases = false
             if (this.validatePhrase(this.masked)=='') this.reset()
@@ -246,6 +247,9 @@ var app = new Vue({
         },
 
         edit: function(item) {
+            try {
+            this.editing.show = true
+            console.log('after:',this.editing.show)
             var db = item.tablename.split('.')[0]
             var tb = item.tablename.split('.')[2]
             this.editing.selectedDb = db
@@ -256,8 +260,16 @@ var app = new Vue({
             this.editing.excludedHeaders = item.excludedheaders.length == 0 ? [] : item.excludedheaders.split('|||')
             this.editing.lockedHeaders = item.lockedheaders.length == 0 ? [] : item.lockedheaders.split('|||')
             this.editing.allowedUsers = item.allowedusers.length == 0 ? [] : item.allowedusers.split('|||')
+            }
+            catch(err) {
+                console.log('Error! - ', err)
+                return
+            }
         },
-
+        onBlur: function() {
+            this.editing.show = false
+            console.log('onBlur', this.editing.show)
+        },
         removeExcludedHeader: function(item, editing) {
             if (!editing) this.excludedHeaders.splice(this.excludedHeaders.indexOf(item), 1)
             else this.editing.excludedHeaders.splice(this.editing.excludedHeaders.indexOf(item), 1)
